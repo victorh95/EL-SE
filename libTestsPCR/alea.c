@@ -5,7 +5,7 @@
 #include "alea.h"
 
 /**
- * Initialisation du générateur aléatoire
+ * Initialisation du gÃ©nÃ©rateur alÃ©atoire
  */
 void aleainit()
 {
@@ -13,7 +13,7 @@ void aleainit()
 }
 
 /**
- * Retourne un nombre aléatoire en min et max (bornes comprises)
+ * Retourne un nombre alÃ©atoire entre min et max (bornes comprises)
  */
 int alea(int min, int max)
 {

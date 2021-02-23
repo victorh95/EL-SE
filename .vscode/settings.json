@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "unistd.h": "c",
+        "alea.h": "c",
+        "lectureecriture.h": "c"
+    }
+}

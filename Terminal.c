@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+
 #include "libTestsPCR/lectureEcriture.h"
 
 void usage(char * basename) {
