@@ -7,22 +7,23 @@
 
 void usage(char * basename) {
     fprintf(stderr,
-        "Utilisation : %s [<programme 1> [<programme 2>]]\n",
+        "Utilisation : %s <descripteur de fichier (entrée)> <descripteur de fichier (sortie)>\n",
         basename);
     exit(1);
 }
 
 int main(int argc, char *argv[]) {
-    char* test = "";
     if (argc != 3) usage(argv[0]);
-
-    long fd0 = strtol(argv[1], NULL, 10);
-    long fd1 = strtol(argv[2], NULL, 10);
-    dup2(fd0, 0);
-    dup2(fd1, 1);
-    while(strlen(test) == 0){
-        test = litLigne(fd0);        
+ 
+    long entree = strtol(argv[1], NULL, 10);
+    long sortie = strtol(argv[2], NULL, 10);
+    dup2(entree, 0);
+    dup2(sortie, 1);
+    char* buffer = NULL;
+    buffer = malloc(TAILLEBUF);
+    while(strlen(buffer) == 0){
+        buffer = litLigne(entree);        
     }
-    printf("%s", test);     
+    ecritLigne(sortie, buffer);     
     return 0;
 }
