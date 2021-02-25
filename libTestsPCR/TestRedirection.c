@@ -12,13 +12,13 @@ void usage(char * basename) {
 
 int main(int argc, char *argv[]) {
     int pid;       /* permet d'identifier qui on est*/
-    int fdpipe[2]; /* sera utilisé pour lier les processus */
+    int fdpipe[2]; /* sera utilisÃ© pour lier les processus */
 
     if (argc != 3) usage(argv[0]);
 
-    /* on créé le pipe  qui sera utilisé pour relier 
+    /* on crÃ©Ã© le pipe  qui sera utilisÃ© pour relier 
        la sortie du premier processus 
-       vers l'entrée du second 
+       vers l'entrÃ©e du second 
     */
     if ( pipe(fdpipe) == -1 ) {
         perror("pipe");
@@ -27,27 +27,27 @@ int main(int argc, char *argv[]) {
 
     switch(pid = fork()) {
         case -1:
-            /* le fork a échoué */
+            /* le fork a Ã©chouÃ© */
             perror("fork");
             exit(-1);       
         case 0:
             /* code du fils */
             /* on fait en sorte que lorsque le processus 
-               écrira sur l'entrée standard (1) 
+               Ã©crira sur l'entrÃ©e standard (1) 
                il le fera en fait dans le pipe (fdpipe[1])
             */
             dup2(fdpipe[1], 1);
-            /* on ferme tout, même le pipe... 
+            /* on ferme tout, mÃªme le pipe... 
                on n'en a plus besoin 
             */
             close(fdpipe[0]);
             close(fdpipe[1]);
             execlp(argv[1], argv[1],NULL);
             /* pas besoin de break,
-               ce code n'existe déjà plus à l'exécution 
+               ce code n'existe dÃ©jÃ  plus Ã  l'exÃ©cution 
             */
         default :
-            /* code du père */  
+            /* code du pÃ¨re */  
             /* on fait en sorte que lorsque le processus 
                lira sur la sortie standard (0) 
                il le fera en fait dans le pipe (fdpipe[0])
@@ -58,9 +58,9 @@ int main(int argc, char *argv[]) {
             execlp(argv[2],argv[2], NULL);
     }
    /*
-   cette portion de code ne sera jamais exécutée, 
-   puisque les processus ont déjà
-   été remplacé. On met néanmoins un 
+   cette portion de code ne sera jamais exÃ©cutÃ©e, 
+   puisque les processus ont dÃ©jÃ 
+   Ã©tÃ© remplacÃ©. On met nÃ©anmoins un 
    return sinon le compilateur proteste.
    */
    return 0;

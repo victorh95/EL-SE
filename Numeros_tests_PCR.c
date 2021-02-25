@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "libTestsPCR/alea.h"
 #include "libTestsPCR/lectureEcriture.h"
+#include "libTestsPCR/alea.h"
 
 void usage(char* basename) {
     fprintf(stderr,
@@ -16,18 +18,32 @@ void usage(char* basename) {
 
 void numerosTestsPCR(char* centre, int fd, long nombreTests){
     char* buffer = NULL;
-    int aleatest;
+    int alea4;
     aleainit();
     for(int i = 0; i<nombreTests; i++){
         ecritLigne(fd, centre);
         for(int i = 0; i<3; i++){
-            aleatest = alea(0, 9999);
+            alea4 = alea(0, 9999);
             buffer = malloc(TAILLEBUF);
-            sprintf(buffer, "%d", aleatest);
+            sprintf(buffer, "%d", alea4);
+            switch(strlen(buffer)){
+                case 1 :
+                    strcat(buffer, "000");
+                    break;
+                case 2 :
+                    strcat(buffer, "00");
+                    break;
+                case 3 :
+                    strcat(buffer, "0");
+                    break;
+                default :
+                    break;
+            }
             ecritLigne(fd, buffer);
         }
         ecritLigne(fd, "\n");
     }
+    free(buffer);
 }
 
 int main(int argc, char *argv[]) {
@@ -41,5 +57,7 @@ int main(int argc, char *argv[]) {
     numerosTestsPCR("1111", fd, nombresTests);
     //Madrid
     numerosTestsPCR("2222", fd, nombresTests);
+    
+    close(fd);
     return 0;
 }

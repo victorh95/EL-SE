@@ -13,7 +13,7 @@ int main(int argc, char **argv)
   int decoupeOk;
 
   aleainit();
-  // Creation d'une demande de validation pour une durée de validité aléatoire
+  // Création d'une demande de validation pour une durée de validité aléatoire
   
   sprintf(valeur,"%d",alea(1,50000));
   printf("Demande de validation d'un test dont la durée de validité est %s secondes\n",valeur);
