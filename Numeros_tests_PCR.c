@@ -18,13 +18,13 @@ void usage(char* basename) {
 
 void numerosTestsPCR(char* centre, int fd, long nombreTests){
     char* buffer = NULL;
+    buffer = malloc(TAILLEBUF);
     int alea4;
     aleainit();
     for(int i = 0; i<nombreTests; i++){
         ecritLigne(fd, centre);
         for(int i = 0; i<3; i++){
             alea4 = alea(0, 9999);
-            buffer = malloc(TAILLEBUF);
             sprintf(buffer, "%d", alea4);
             switch(strlen(buffer)){
                 case 1 :
@@ -50,13 +50,14 @@ int main(int argc, char *argv[]) {
     if (argc != 2) usage(argv[0]);
 
     int fd = open("Numeros_tests_PCR.txt", O_CREAT | O_WRONLY, 0644);
-    long nombresTests = strtol(argv[1], NULL, 10);
+    long nombreTests = strtol(argv[1], NULL, 10);
+    ecritLigne(fd, strcat(argv[1], "\n"));
     //Paris
-    numerosTestsPCR("0000", fd, nombresTests);
+    numerosTestsPCR("0000", fd, nombreTests);
     //Nice
-    numerosTestsPCR("1111", fd, nombresTests);
+    numerosTestsPCR("1111", fd, nombreTests);
     //Madrid
-    numerosTestsPCR("2222", fd, nombresTests);
+    numerosTestsPCR("2222", fd, nombreTests);
     
     close(fd);
     return 0;

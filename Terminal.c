@@ -8,16 +8,17 @@
 
 #include "libTestsPCR/lectureEcriture.h"
 #include "libTestsPCR/alea.h"
+#include "libTestsPCR/message.h"
 
 void usage(char * basename) {
     fprintf(stderr,
-        "Utilisation : %s <descripteur de fichier (entrée)> <descripteur de fichier (sortie)> <nombre de tests PCR générés par centre>\n",
+        "Utilisation : %s <descripteur de fichier (entrée)> <descripteur de fichier (sortie)>\n",
         basename);
     exit(1);
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) usage(argv[0]);
+    if (argc != 3) usage(argv[0]);
 
     long entree = strtol(argv[1], NULL, 10);
     long sortie = strtol(argv[2], NULL, 10);
@@ -25,15 +26,21 @@ int main(int argc, char *argv[]) {
     dup2(sortie, 1);
     
     int fd = open("Numeros_tests_PCR.txt", O_RDONLY);
-    long nombresTests = strtol(argv[3], NULL, 10);
+    int nombreTests = strtol(litLigne(fd), NULL, 10);
     aleainit();
-    int aleatests = alea(1, 3*nombresTests);
+    int aleaTest = alea(1, 3*nombreTests);
     char* buffer = NULL;
     buffer = malloc(TAILLEBUF);
-    for(int i = 1; i<3*nombresTests; i++){
+    for(int i = 1; i<3*nombreTests; i++){
         buffer = litLigne(fd); 
-        if(i == aleatests) break;
+        if(i == aleaTest) break;
     }      
+    buffer[strcspn(buffer, "\n")] = 0;
+    int aleaValidite = alea(24, 168);
+    char* validite = NULL;
+    validite = malloc(5);
+    sprintf(validite, "%d", aleaValidite);
+    buffer = message(buffer, "Demande", validite);
     ecritLigne(sortie, buffer);  
     buffer = "";
     while(strlen(buffer) == 0){

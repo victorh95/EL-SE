@@ -1,4 +1,4 @@
-all:	 TestMessage TestRedirection TestLectureEcriture
+all: TestMessage TestRedirection TestLectureEcriture
 
 message.o: message.c message.h
 	gcc -Wall -c message.c
