@@ -23,7 +23,7 @@
  * être allouées avant l'appel à decoupe
  */
 int decoupe(char *message,      /* Source a découper */
-	    char *nTest,        /* no du test PCR concerne */
+	    char *nTest,        /* no du test PCR concerné */
 	    char *type,         /* Type du message */
 	    char *valeur        /* Valeur associée au message */
 	    )

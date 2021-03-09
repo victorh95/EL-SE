@@ -17,8 +17,7 @@ void usage(char* basename) {
 }
 
 void numerosTestsPCR(char* centre, int fd, long nombreTests){
-    char* buffer = NULL;
-    buffer = malloc(TAILLEBUF);
+    char* buffer = malloc(TAILLEBUF);
     int alea4;
     aleainit();
     for(int i = 0; i<nombreTests; i++){

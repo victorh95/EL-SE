@@ -11,7 +11,7 @@
  */
 
 int decoupe(char *message,      /* Source a découper */
-	    char *nTest,        /* no de carte concernee */
+	    char *nTest,        /* no du test PCR concerné */
 	    char *type,         /* Type du message */
 	    char *valeur        /* Valeur associée au message */
 	    );

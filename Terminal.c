@@ -29,25 +29,43 @@ int main(int argc, char *argv[]) {
     int nombreTests = strtol(litLigne(fd), NULL, 10);
     aleainit();
     int aleaTest = alea(1, 3*nombreTests);
-    char* buffer = NULL;
-    buffer = malloc(TAILLEBUF);
+    char* buffer = malloc(TAILLEBUF);
     for(int i = 1; i<3*nombreTests; i++){
         buffer = litLigne(fd); 
         if(i == aleaTest) break;
     }      
     buffer[strcspn(buffer, "\n")] = 0;
     int aleaValidite = alea(24, 168);
-    char* validite = NULL;
-    validite = malloc(5);
+    char* validite = malloc(5);
     sprintf(validite, "%d", aleaValidite);
-    buffer = message(buffer, "Demande", validite);
+    char* nTestEnvoye = malloc(50);
+    nTestEnvoye = buffer;
+    buffer = message(nTestEnvoye, "Demande", validite);
     ecritLigne(sortie, buffer);  
-    buffer = "";
-    while(strlen(buffer) == 0){
-        buffer = litLigne(entree);        
+          
+    char* nTestRecu = malloc(50);
+    char* type = malloc(50);
+    char* valeur = malloc(50);
+    if(!decoupe(litLigne(entree), nTestRecu, type, valeur)){
+        perror("Erreur de la fonction decoupe");
+        exit(-1);
+    };
+    if(strcmp(type, "Reponse") != 0 || strcmp(nTestRecu, nTestEnvoye) != 0){
+        ecritLigne(1, "Mauvais message. \n");
+        exit(-1);
+    }    
+    if(strcmp(valeur, "1") == 0){
+        ecritLigne(1, "Demande acceptée. \n");
+    } else{
+        ecritLigne(1, "Demande refusée. \n");
     }
 
     free(buffer);
+    free(validite);
+    free(nTestEnvoye);
+    free(nTestRecu);
+    free(type);
+    free(valeur);
     close(entree);
     close(sortie);
     close(fd);

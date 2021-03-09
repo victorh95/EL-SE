@@ -11,19 +11,24 @@
 #include "libTestsPCR/alea.h"
 
 void numerosTestsPCRcentre(char* centre, int fd, long nombreTests){
-    char* nomFichier = NULL;
-    nomFichier = malloc(100);
+    char* nomFichier = malloc(100); 
     strcpy(nomFichier, "Numeros_tests_PCR_");
     strcat(nomFichier, centre);
     strcat(nomFichier, ".txt");
     int fd1 = open(nomFichier, O_CREAT | O_WRONLY, 0644);
     
-    char* buffer = NULL;
-    buffer = malloc(TAILLEBUF);
+    char* buffer = malloc(TAILLEBUF);
+    int date = time(NULL); 
+    int aleaDate;
+    char* testDate = malloc(50);
+    int aleaResultat;
     for(int i = 0; i<nombreTests; i++){
         buffer = litLigne(fd);
         buffer[strcspn(buffer, "\n")] = 0;
-        int aleaResultat = alea(0, 1);
+        aleaDate = alea(0, 7 * 86400);
+        sprintf(testDate, " %d", date - aleaDate);
+        strcat(buffer, testDate);
+        aleaResultat = alea(0, 1);
         if(aleaResultat == 0) strcat(buffer, " Négatif \n");
         else strcat(buffer, " Positif \n");
         ecritLigne(fd1, buffer);
@@ -31,6 +36,7 @@ void numerosTestsPCRcentre(char* centre, int fd, long nombreTests){
     
     free(nomFichier);
     free(buffer);
+    free(testDate);
 }
 
 int main(int argc, char *argv[]) {
