@@ -7,22 +7,24 @@
 #include <fcntl.h>
 #include <time.h>
 
-#include "libTestsPCR/lectureEcriture.h"
-#include "libTestsPCR/alea.h"
+#include "../libTestsPCR/lectureEcriture.h"
+#include "../libTestsPCR/alea.h"
 
-void numerosTestsPCRcentre(char* centre, int fd, long nombreTests){
+void numerosTestsPCRcentre(char* centre, int fd, char* nombreTests){
     char* nomFichier = malloc(100); 
     strcpy(nomFichier, "Numeros_tests_PCR_");
     strcat(nomFichier, centre);
     strcat(nomFichier, ".txt");
     int fd1 = open(nomFichier, O_CREAT | O_WRONLY, 0644);
-    
+    ecritLigne(fd1, nombreTests);
+
+    long nombreTests_long = strtol(nombreTests, NULL, 10);
     char* buffer = malloc(TAILLEBUF);
     int date = time(NULL); 
     int aleaDate;
     char* testDate = malloc(50);
     int aleaResultat;
-    for(int i = 0; i<nombreTests; i++){
+    for(int i = 0; i<nombreTests_long; i++){
         buffer = litLigne(fd);
         buffer[strcspn(buffer, "\n")] = 0;
         aleaDate = alea(0, 7 * 86400);
@@ -37,11 +39,12 @@ void numerosTestsPCRcentre(char* centre, int fd, long nombreTests){
     free(nomFichier);
     free(buffer);
     free(testDate);
+    close(fd1);
 }
 
 int main(int argc, char *argv[]) {
     int fd = open("Numeros_tests_PCR.txt", O_RDONLY);
-    int nombreTests = strtol(litLigne(fd), NULL, 10);
+    char* nombreTests = litLigne(fd);
     //Paris
     numerosTestsPCRcentre("Paris", fd, nombreTests);
     //Nice

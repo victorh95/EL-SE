@@ -6,8 +6,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "libTestsPCR/lectureEcriture.h"
-#include "libTestsPCR/alea.h"
+#include "../libTestsPCR/lectureEcriture.h"
+#include "../libTestsPCR/alea.h"
 
 void usage(char* basename) {
     fprintf(stderr,
@@ -48,9 +48,9 @@ void numerosTestsPCR(char* centre, int fd, long nombreTests){
 int main(int argc, char *argv[]) {
     if (argc != 2) usage(argv[0]);
 
-    int fd = open("Numeros_tests_PCR.txt", O_CREAT | O_WRONLY, 0644);
-    long nombreTests = strtol(argv[1], NULL, 10);
+    int fd = open("Numeros_tests_PCR.txt", O_CREAT | O_WRONLY, 0644);    
     ecritLigne(fd, strcat(argv[1], "\n"));
+    long nombreTests = strtol(argv[1], NULL, 10);
     //Paris
     numerosTestsPCR("0000", fd, nombreTests);
     //Nice

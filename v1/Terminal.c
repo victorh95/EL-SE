@@ -6,9 +6,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "libTestsPCR/lectureEcriture.h"
-#include "libTestsPCR/alea.h"
-#include "libTestsPCR/message.h"
+#include "../libTestsPCR/lectureEcriture.h"
+#include "../libTestsPCR/alea.h"
+#include "../libTestsPCR/message.h"
 
 void usage(char * basename) {
     fprintf(stderr,

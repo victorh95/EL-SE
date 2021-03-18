@@ -7,8 +7,8 @@
 #include <fcntl.h>
 #include <time.h>
 
-#include "libTestsPCR/lectureEcriture.h"
-#include "libTestsPCR/message.h"
+#include "../libTestsPCR/lectureEcriture.h"
+#include "../libTestsPCR/message.h"
 
 void usage(char * basename) {
     fprintf(stderr,
@@ -56,8 +56,9 @@ int main(int argc, char *argv[]) {
     strcat(nomFichier, ".txt");
     int fd = open(nomFichier, O_RDONLY);
     
+    long nombreTests = strtol(litLigne(fd), NULL, 10);
     char* buffer = malloc(TAILLEBUF);
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < nombreTests; i++){
         buffer = strtok(litLigne(fd), " " );
         if(strcmp(buffer, nTest) == 0){
             buffer = strtok(NULL, " " );
