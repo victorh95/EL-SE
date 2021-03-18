@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
     while(1){
         for(int i = 0; i < tailleMemoire; i++){
             buffer = litLigne(memoire[i].entree);
+            if(i == 0 && buffer == NULL) return 0;
             if(buffer != NULL) memoire[i].demande = buffer;
         }
         for(int i = 0; i < tailleMemoire; i++){
@@ -70,10 +71,8 @@ int main(int argc, char *argv[]) {
             if(memoire[i].reponse != NULL) ecritLigne(memoire[i].sortie, memoire[i].reponse);
             memoire[i].demande = "";
             memoire[i].reponse = "";
-        } 
+        }
     }
     
     return 0;
 }
-
-//tableau de structure
