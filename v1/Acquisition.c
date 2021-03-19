@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
     int fd3 = open("Terminal_Acquisition.txt", O_RDONLY);
     int fd4 = open("Validation_Acquisition.txt", O_RDONLY);
     int fd5 = open("InterArchives_Acquisition.txt", O_RDONLY);
+    
     for(int i = 0; i < tailleMemoire; i++){
         memoire[i].entree = fd3; 
         memoire[i].sortie = fd0;
@@ -47,12 +48,17 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[2], "Nice") == 0) centre = 1;
     else centre = 2;
     
+    int stop = 0;
+
     while(1){
         for(int i = 0; i < tailleMemoire; i++){
+            if(memoire[i].reponse != NULL) ecritLigne(memoire[i].sortie, memoire[i].reponse);
             buffer = litLigne(memoire[i].entree);
-            if(i == 0 && buffer == NULL) return 0;
+            if(i == 0 && buffer == NULL) stop = 1;
             if(buffer != NULL) memoire[i].demande = buffer;
         }
+        if(stop == 1) return 0;
+
         for(int i = 0; i < tailleMemoire; i++){
             if(memoire[i].demande[1] - '0' == centre){
                 ecritLigne(fd1, memoire[i].demande);
@@ -60,17 +66,13 @@ int main(int argc, char *argv[]) {
                 if(buffer != NULL) memoire[i].reponse = buffer;
             } 
         }     
+
         for(int i = 0; i < tailleMemoire; i++){
             if(memoire[i].demande[1] - '0' != centre){
                 ecritLigne(fd2, memoire[i].demande);
                 buffer = litLigne(fd5);
                 if(buffer != NULL) memoire[i].reponse = buffer;
             }
-        }
-        for(int i = 0; i < tailleMemoire; i++){
-            if(memoire[i].reponse != NULL) ecritLigne(memoire[i].sortie, memoire[i].reponse);
-            memoire[i].demande = "";
-            memoire[i].reponse = "";
         }
     }
     
