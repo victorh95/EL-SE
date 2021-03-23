@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     if (argc != 3) usage(argv[0]);
 
     long tailleMemoire = strtol(argv[1], NULL, 10);
-    struct donnees memoire[tailleMemoire]; 
+    struct donnees* memoire = calloc(tailleMemoire, TAILLEBUF);; 
     char* buffer = malloc(TAILLEBUF);
 
     int fd0 = open("Acquisition_Terminal.txt", O_WRONLY);
@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < tailleMemoire; i++){
         memoire[i].entree = fd3; 
         memoire[i].sortie = fd0;
-        memoire[i].demande = malloc(TAILLEBUF);
-        memoire[i].reponse = malloc(TAILLEBUF);
+        memoire[i].demande = "";
+        memoire[i].reponse = "";
     } 
 
     int centre;
@@ -52,7 +52,11 @@ int main(int argc, char *argv[]) {
 
     while(1){
         for(int i = 0; i < tailleMemoire; i++){
-            if(memoire[i].reponse != NULL) ecritLigne(memoire[i].sortie, memoire[i].reponse);
+            if((strcmp(memoire[i].reponse, "") != 0)){
+                ecritLigne(memoire[i].sortie, memoire[i].reponse);
+                memoire[i].demande = "";
+                memoire[i].reponse = "";
+            }
             buffer = litLigne(memoire[i].entree);
             if(i == 0 && buffer == NULL) stop = 1;
             if(buffer != NULL) memoire[i].demande = buffer;

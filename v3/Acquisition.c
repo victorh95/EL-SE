@@ -19,6 +19,7 @@ struct donnees {
 
 long tailleMemoire;
 struct donnees* memoire;
+int fdpipe[2];
 int fd0;
 int fd1;
 int fd2;
@@ -34,7 +35,7 @@ sem_t semDemande2;
 
 void usage(char * basename) {
     fprintf(stderr,
-        "Utilisation : %s <taille de la mémoire (nombre de demandes de validation)> <nom du centre>\n",
+        "Utilisation : %s <taille de la mémoire> <nom du centre> <code à 4 chiffres du centre> <nom du fichier des résultats des tests PCR> <nombre terminaux>\n",
         basename);
     exit(1);
 }
@@ -100,7 +101,34 @@ void *threadInterArchives(void *inutilise)
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) usage(argv[0]);
+    if (argc != 6) usage(argv[0]);
+
+    //Création des terminaux
+    int pid; 
+    long nbTerminaux = strtol(argv[5], NULL, 10);
+    for(int i = 0; i<nbTerminaux; i++){
+        if (pipe(fdpipe) == -1){
+            perror("Erreur lors de la création du pipe");
+            exit(-1);
+        }
+
+        switch(pid = fork()){
+        case -1:
+            perror("fork");
+            exit(-1);
+        case 0:
+            dup2(fdpipe[0], 0);
+            dup2(fdpipe[1], 1);
+            close(fdpipe[0]);
+            close(fdpipe[1]);
+            execlp("xterm -e Terminal", "xterm -e Terminal", fdpipe[0], fdpipe[1], argv[1], NULL);
+        default :
+            dup2(fdpipe[0], 0);
+            close(fdpipe[0]);
+            close(fdpipe[1]);
+            execlp(argv[2],argv[2], NULL);
+        }
+    }
 
     tailleMemoire = strtol(argv[1], NULL, 10);
     memoire = calloc(tailleMemoire, TAILLEBUF);
