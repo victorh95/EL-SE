@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     dup2(entree, 0);
     dup2(sortie, 1);
     
-    int fd = open(argv[2], O_RDONLY);
+    int fd = open(argv[3], O_RDONLY);
     int nombreTests = strtol(litLigne(fd), NULL, 10);
     aleainit();
     int aleaTest = alea(1, 3*nombreTests);

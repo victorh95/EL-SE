@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     long sortie = strtol(argv[2], NULL, 10);
     dup2(entree, 0);
     dup2(sortie, 1);
-    
+
     int fd = open("Numeros_tests_PCR.txt", O_RDONLY);
     int nombreTests = strtol(litLigne(fd), NULL, 10);
     aleainit();

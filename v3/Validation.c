@@ -12,7 +12,7 @@
 
 void usage(char * basename) {
     fprintf(stderr,
-        "Utilisation : %s <descripteur de fichier (entrée)> <descripteur de fichier (sortie)> <nom du centre>\n",
+        "Utilisation : %s <descripteur de fichier (entrée)> <descripteur de fichier (sortie)> <nom du fichier des résultats des tests PCR>\n",
         basename);
     exit(1);
 }
@@ -37,10 +37,7 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
-    char* nomFichier = malloc(100); 
-    strcpy(nomFichier, "Numeros_tests_PCR_");
-    strcat(nomFichier, argv[3]);
-    strcat(nomFichier, ".txt");
+    char* nomFichier = argv[3]; 
     int fd = open(nomFichier, O_RDONLY);
     
     long nombreTests = strtol(litLigne(fd), NULL, 10);

@@ -17,21 +17,19 @@ struct donnees {
     char* reponse;
 };
 
+struct ES {
+    int entree;
+    int sortie;
+};
+
 long tailleMemoire;
 struct donnees* memoire;
-int fdpipe[2];
-int fd0;
-int fd1;
-int fd2;
-int fd3;
-int fd4;
-int fd5;
 int centre;
-int stop;
 
 sem_t semLibre;
+sem_t semEcrit;
 sem_t semDemande1;
-sem_t semDemande2;
+//sem_t semDemande2;
 
 void usage(char * basename) {
     fprintf(stderr,
@@ -40,8 +38,9 @@ void usage(char * basename) {
     exit(1);
 }
 
-void *threadTerminal(void *inutilise)
+void *threadTerminal(void *terminalES)
 {
+    struct ES *memoireTerminalES = terminalES;
     char* buffer = malloc(TAILLEBUF);
     while(1){                     
         for(int i = 0; i < tailleMemoire; i++){    
@@ -52,38 +51,39 @@ void *threadTerminal(void *inutilise)
                 memoire[i].reponse = "";
             }
             if(strcmp(memoire[i].demande, "") == 0){
-                buffer = litLigne(memoire[i].entree);
-                if(buffer == NULL) stop++;
+                buffer = litLigne(memoireTerminalES->entree);
                 if(buffer != NULL){
+                    sem_wait(&semEcrit);
+                    memoire[i].entree = memoireTerminalES->entree;
+                    memoire[i].sortie = memoireTerminalES->sortie;
                     memoire[i].demande = buffer;
-                }  
+                    sem_post(&semEcrit);
+                }
             }            
             sem_post(&semDemande1);
-            sem_post(&semDemande2);           
+            //sem_post(&semDemande2);           
         }       
-        if(stop == tailleMemoire) pthread_exit(NULL);
-        else stop = 0;
     }
 }
 
-void *threadValidation(void *inutilise)
+void *threadValidation(void *validationES)
 {
+    struct ES *memoireValidationES = validationES;
     char* buffer = malloc(TAILLEBUF);
     while(1){        
         for(int i = 0; i < tailleMemoire; i++){   
             sem_wait(&semDemande1);         
             if(memoire[i].demande[1] - '0' == centre){
-                ecritLigne(fd1, memoire[i].demande);
-                buffer = litLigne(fd4);
+                ecritLigne(memoireValidationES->sortie, memoire[i].demande);
+                buffer = litLigne(memoireValidationES->entree);
                 if(buffer != NULL) memoire[i].reponse = buffer; 
                 sem_post(&semLibre);
             }             
         }    
-        if(stop == tailleMemoire) pthread_exit(NULL);  
     }   
 }
 
-void *threadInterArchives(void *inutilise)
+/*void *threadInterArchives(void *inutilise)
 {
     char* buffer = malloc(TAILLEBUF);
     while(1){        
@@ -95,10 +95,9 @@ void *threadInterArchives(void *inutilise)
                 if(buffer != NULL) memoire[i].reponse = buffer;
                 sem_post(&semLibre);
             }
-        }  
-        if(stop == tailleMemoire) pthread_exit(NULL);      
+        }      
     }
-}
+}*/
 
 int main(int argc, char *argv[]) {
     if (argc != 6) usage(argv[0]);
@@ -106,43 +105,69 @@ int main(int argc, char *argv[]) {
     //Création des terminaux
     int pid; 
     long nbTerminaux = strtol(argv[5], NULL, 10);
+    pthread_t thTerminal[nbTerminaux];
+    int fdpipeTerminalEntree[2];
+    int fdpipeTerminalSortie[2];
     for(int i = 0; i<nbTerminaux; i++){
-        if (pipe(fdpipe) == -1){
-            perror("Erreur lors de la création du pipe");
+        if ((pipe(fdpipeTerminalEntree) == -1) || (pipe(fdpipeTerminalSortie) == -1)){
+            perror("Erreur lors de la création du ou des pipe");
             exit(-1);
         }
 
         switch(pid = fork()){
         case -1:
-            perror("fork");
+            perror("Erreur de fork");
             exit(-1);
         case 0:
-            dup2(fdpipe[0], 0);
-            dup2(fdpipe[1], 1);
-            close(fdpipe[0]);
-            close(fdpipe[1]);
-            execlp("xterm -e Terminal", "xterm -e Terminal", fdpipe[0], fdpipe[1], argv[1], NULL);
+            dup2(fdpipeTerminalSortie[0], 0);
+            close(fdpipeTerminalSortie[0]);
+            close(fdpipeTerminalEntree[1]);
+            execlp("xterm -e Terminal", "xterm -e Terminal", fdpipeTerminalEntree[0], fdpipeTerminalSortie[1], argv[1], NULL);
         default :
-            dup2(fdpipe[0], 0);
-            close(fdpipe[0]);
-            close(fdpipe[1]);
-            execlp(argv[2],argv[2], NULL);
+            dup2(fdpipeTerminalEntree[1], 1);
+            close(fdpipeTerminalSortie[0]);
+            close(fdpipeTerminalEntree[1]);
+            struct ES *terminalES = malloc(100);
+            terminalES->entree = fdpipeTerminalSortie[0];
+            terminalES->sortie = fdpipeTerminalEntree[1];
+            pthread_create(&thTerminal[i], NULL, threadTerminal, terminalES);
+            pthread_join(thTerminal[i],NULL);
         }
+    }
+
+    //Création du serveur de validation
+    pthread_t thValidation;
+    int fdpipeValidationEntree[2];
+    int fdpipeValidationSortie[2];
+    if ((pipe(fdpipeValidationEntree) == -1) || (pipe(fdpipeValidationSortie) == -1)){
+            perror("Erreur lors de la création du ou des pipe");
+            exit(-1);
+        }
+
+    switch(pid = fork()){
+    case -1:
+        perror("Erreur de fork");
+        exit(-1);
+    case 0:
+        dup2(fdpipeValidationSortie[0], 0);
+        close(fdpipeValidationSortie[0]);
+        close(fdpipeValidationEntree[1]);
+        execlp("./Validation", "./Validation", fdpipeValidationEntree[0], fdpipeValidationSortie[1], argv[4], NULL);
+    default :
+        dup2(fdpipeValidationEntree[1], 1);
+        close(fdpipeValidationSortie[0]);
+        close(fdpipeValidationEntree[1]);
+        struct ES *validationES = malloc(100);
+        validationES->entree = fdpipeValidationSortie[0];
+        validationES->sortie = fdpipeValidationEntree[1];
+        pthread_create(&thValidation, NULL, threadValidation, validationES);
+        pthread_join(thValidation,NULL);
     }
 
     tailleMemoire = strtol(argv[1], NULL, 10);
     memoire = calloc(tailleMemoire, TAILLEBUF);
 
-    fd0 = open("Acquisition_Terminal.txt", O_WRONLY);
-    fd1 = open("Acquisition_Validation.txt", O_WRONLY);
-    fd2 = open("Acquisition_InterArchives.txt", O_WRONLY);
-    fd3 = open("Terminal_Acquisition.txt", O_RDONLY);
-    fd4 = open("Validation_Acquisition.txt", O_RDONLY);
-    fd5 = open("InterArchives_Acquisition.txt", O_RDONLY);
-
     for(int i = 0; i < tailleMemoire; i++){
-        memoire[i].entree = fd3; 
-        memoire[i].sortie = fd0;
         memoire[i].demande = "";
         memoire[i].reponse = "";
     }
@@ -151,18 +176,13 @@ int main(int argc, char *argv[]) {
     else if(strcmp(argv[2], "Nice") == 0) centre = 1;
     else centre = 2;
 
-    stop = 0;
-
     sem_init(&semLibre, 0, tailleMemoire);
     sem_init(&semDemande1, 0, 0);
-    sem_init(&semDemande2, 0, 0);
-    pthread_t thTerminal, thValidation, thInterArchives;
-    pthread_create(&thTerminal, NULL, threadTerminal, NULL);
-    pthread_create(&thValidation, NULL, threadValidation, NULL);
-    pthread_create(&thInterArchives, NULL, threadInterArchives, NULL);
-    pthread_join(thTerminal,NULL);
-    pthread_join(thValidation,NULL);
-    pthread_join(thInterArchives,NULL);
+    //sem_init(&semDemande2, 0, 0);
+    sem_init(&semEcrit, 0, 1);
+    //pthread_t thInterArchives;
+    //pthread_create(&thInterArchives, NULL, threadInterArchives, NULL);
+    //pthread_join(thInterArchives,NULL);
     
     return 0;
 }
