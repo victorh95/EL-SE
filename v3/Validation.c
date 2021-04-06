@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
             exit(-1);
         }
         if(strcmp(type, "Demande") != 0){
-            ecritLigne(1, "Mauvais type de message. \n");
+            printf("Mauvais type de message. \n");
             exit(-1);
         }
         printf("test");

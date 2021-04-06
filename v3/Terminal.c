@@ -52,13 +52,13 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
     if(strcmp(type, "Reponse") != 0 || strcmp(nTestRecu, nTestEnvoye) != 0){
-        ecritLigne(1, "Mauvais message. \n");
+        printf("Mauvais message. \n");
         exit(-1);
     }    
     if(strcmp(valeur, "1") == 0){
-        ecritLigne(1, "Demande acceptée. \n");
+        printf("Demande acceptée. \n");
     } else{
-        ecritLigne(1, "Demande refusée. \n");
+        printf("Demande refusée. \n");
     }
 
     free(buffer);
