@@ -71,7 +71,7 @@ void *threadValidation(void *inutilise)
     while(1){        
         for(int i = 0; i < tailleMemoire; i++){   
             sem_wait(&semDemande1);         
-            if(memoire[i].demande[1] - '0' == centre){
+            if((strcmp(memoire[i].reponse, "") == 0) && (memoire[i].demande[1] - '0' == centre)){
                 ecritLigne(fd1, memoire[i].demande);
                 buffer = litLigne(fd4);
                 if(buffer != NULL) memoire[i].reponse = buffer; 
@@ -88,7 +88,7 @@ void *threadInterArchives(void *inutilise)
     while(1){        
         for(int i = 0; i < tailleMemoire; i++){
             sem_wait(&semDemande2);
-            if(memoire[i].demande[1] - '0' != centre){
+            if((strcmp(memoire[i].reponse, "") == 0) && (memoire[i].demande[1] - '0' != centre)){
                 ecritLigne(fd2, memoire[i].demande);
                 buffer = litLigne(fd5);
                 if(buffer != NULL) memoire[i].reponse = buffer;

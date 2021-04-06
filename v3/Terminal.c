@@ -22,9 +22,7 @@ int main(int argc, char *argv[]) {
 
     long entree = strtol(argv[1], NULL, 10);
     long sortie = strtol(argv[2], NULL, 10);
-    dup2(entree, 0);
-    dup2(sortie, 1);
-    
+
     int fd = open(argv[3], O_RDONLY);
     int nombreTests = strtol(litLigne(fd), NULL, 10);
     aleainit();
@@ -42,14 +40,17 @@ int main(int argc, char *argv[]) {
     nTestEnvoye = buffer;
     buffer = message(nTestEnvoye, "Demande", validite);
     ecritLigne(sortie, buffer);  
-          
+    printf("%s", buffer);  
+
     char* nTestRecu = malloc(50);
     char* type = malloc(50);
     char* valeur = malloc(50);
-    if(!decoupe(litLigne(entree), nTestRecu, type, valeur)){
+    buffer = litLigne(entree);
+    printf("%s", buffer);
+    if(!decoupe(buffer, nTestRecu, type, valeur)){
         perror("Erreur de la fonction decoupe");
         exit(-1);
-    };
+    }
     if(strcmp(type, "Reponse") != 0 || strcmp(nTestRecu, nTestEnvoye) != 0){
         ecritLigne(1, "Mauvais message. \n");
         exit(-1);
