@@ -11,7 +11,7 @@
 
 void usage(char* basename) {
     fprintf(stderr,
-        "Utilisation : %s <nombre de tests PCR par centre>\n",
+        "Utilisation : %s <nombre de centres (entre 1 et 3)> <nombre de tests PCR par centre>\n",
         basename);
     exit(1);
 }
@@ -46,18 +46,49 @@ void numerosTestsPCR(char* centre, int fd, long nombreTests){
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) usage(argv[0]);
+    if (argc != 3) usage(argv[0]);
 
-    int fd = open("Numeros_tests_PCR.txt", O_CREAT | O_WRONLY, 0644);    
-    ecritLigne(fd, strcat(argv[1], "\n"));
-    long nombreTests = strtol(argv[1], NULL, 10);
-    //Paris
-    numerosTestsPCR("0000", fd, nombreTests);
-    //Nice
-    numerosTestsPCR("1111", fd, nombreTests);
-    //Madrid
-    numerosTestsPCR("2222", fd, nombreTests);
+    int fd = open("Numeros_tests_PCR.txt", O_CREAT | O_WRONLY, 0644);  
+    long nombreCentres = strtol(argv[1], NULL, 10);
+    long nombreTests = strtol(argv[2], NULL, 10);
+    char* nTotalTests = malloc(100);
+
+    switch(nombreCentres){
+        case 1:
+            sprintf(nTotalTests, "%ld \n", nombreTests);
+            ecritLigne(fd, nTotalTests);
+            //Paris
+            numerosTestsPCR("0000", fd, nombreTests);
+            printf("Le centre de Paris a été crée, son code est : \"0000\".\n");
+            break;
+        case 2:
+            sprintf(nTotalTests, "%ld \n", 2*nombreTests);
+            ecritLigne(fd, nTotalTests);
+            //Paris
+            numerosTestsPCR("0000", fd, nombreTests);
+            //Nice
+            numerosTestsPCR("1111", fd, nombreTests);
+            printf("Les centres de Paris et Nice ont été crées, respectivement, leurs codes sont : \"0000\" et \"1111\".\n");
+            break;
+        case 3:
+            sprintf(nTotalTests, "%ld \n", 3*nombreTests);
+            ecritLigne(fd, nTotalTests);
+            //Paris
+            numerosTestsPCR("0000", fd, nombreTests);
+            //Nice
+            numerosTestsPCR("1111", fd, nombreTests);
+            //Madrid
+            numerosTestsPCR("2222", fd, nombreTests);
+            printf("Les centres de Paris, Nice et Madrid ont été crées, respectivement, leurs codes sont : \"0000\", \"1111\" et \"2222\".\n");
+            break;
+        default:
+            printf("Vous devez choisir un nombre entre 1 et 3.\n");
+            break;
+    }
     
+    execlp("./Numeros_tests_PCR_centre", "./Numeros_tests_PCR_centre", argv[1], argv[2], NULL);
+
+    free(nTotalTests);
     close(fd);
     return 0;
 }
