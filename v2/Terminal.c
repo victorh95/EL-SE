@@ -24,13 +24,13 @@ int main(int argc, char *argv[]) {
     long sortie = strtol(argv[2], NULL, 10);
     dup2(entree, 0);
     dup2(sortie, 1);
-    
+
     int fd = open("Numeros_tests_PCR.txt", O_RDONLY);
     int nombreTests = strtol(litLigne(fd), NULL, 10);
     aleainit();
-    int aleaTest = alea(1, 3*nombreTests);
+    int aleaTest = alea(1, nombreTests);
     char* buffer = malloc(TAILLEBUF);
-    for(int i = 1; i<3*nombreTests; i++){
+    for(int i = 1; i < nombreTests; i++){
         buffer = litLigne(fd); 
         if(i == aleaTest) break;
     }      

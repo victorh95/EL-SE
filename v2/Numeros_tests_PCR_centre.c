@@ -10,6 +10,13 @@
 #include "../libTestsPCR/lectureEcriture.h"
 #include "../libTestsPCR/alea.h"
 
+void usage(char* basename) {
+    fprintf(stderr,
+        "Utilisation : %s <nombre de centres (entre 1 et 3)> <nombre de tests PCR par centre>\n",
+        basename);
+    exit(1);
+}
+
 void numerosTestsPCRcentre(char* centre, int fd, char* nombreTests){
     char* nomFichier = malloc(100); 
     strcpy(nomFichier, "Numeros_tests_PCR_");
@@ -31,8 +38,8 @@ void numerosTestsPCRcentre(char* centre, int fd, char* nombreTests){
         sprintf(testDate, " %d", date - aleaDate);
         strcat(buffer, testDate);
         aleaResultat = alea(0, 1);
-        if(aleaResultat == 0) strcat(buffer, " Négatif \n");
-        else strcat(buffer, " Positif \n");
+        if(aleaResultat == 0) strcat(buffer, " Positif \n");
+        else strcat(buffer, " Négatif \n");
         ecritLigne(fd1, buffer);
     }
     
@@ -43,15 +50,36 @@ void numerosTestsPCRcentre(char* centre, int fd, char* nombreTests){
 }
 
 int main(int argc, char *argv[]) {
+    if (argc != 3) usage(argv[0]);
+
     int fd = open("Numeros_tests_PCR.txt", O_RDONLY);
-    char* nombreTests = litLigne(fd);
-    //Paris
-    numerosTestsPCRcentre("Paris", fd, nombreTests);
-    //Nice
-    numerosTestsPCRcentre("Nice", fd, nombreTests);
-    //Madrid
-    numerosTestsPCRcentre("Madrid", fd, nombreTests);
-    
+    litLigne(fd);
+    long nombreCentres = strtol(argv[1], NULL, 10);
+    strcat(argv[2], "\n");
+
+    switch(nombreCentres){
+        case 1:
+            //Paris
+            numerosTestsPCRcentre("Paris", fd, argv[2]);
+            break;
+        case 2:
+            //Paris
+            numerosTestsPCRcentre("Paris", fd, argv[2]);
+            //Nice
+            numerosTestsPCRcentre("Nice", fd, argv[2]);
+            break;
+        case 3:
+            //Paris
+            numerosTestsPCRcentre("Paris", fd, argv[2]);
+            //Nice
+            numerosTestsPCRcentre("Nice", fd, argv[2]);
+            //Madrid
+            numerosTestsPCRcentre("Madrid", fd, argv[2]);
+            break;
+        default:
+            break;
+    }
+
     close(fd);
     return 0;
 }
