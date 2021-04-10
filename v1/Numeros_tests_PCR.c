@@ -86,9 +86,10 @@ int main(int argc, char *argv[]) {
             break;
     }
     
-    execlp("./Numeros_tests_PCR_centre", "./Numeros_tests_PCR_centre", argv[1], argv[2], NULL);
-
     free(nTotalTests);
     close(fd);
+
+    execlp("./Numeros_tests_PCR_centre", "./Numeros_tests_PCR_centre", argv[1], argv[2], NULL);
+
     return 0;
 }

@@ -12,7 +12,7 @@
 
 void usage(char * basename) {
     fprintf(stderr,
-        "Utilisation : %s <descripteur de fichier (entrée)> <descripteur de fichier (sortie)> <nom du fichier des résultats des tests PCR>\n",
+        "Utilisation : %s <descripteur de fichier (entrée)> <descripteur de fichier (sortie)> <nom du fichier des tests PCR>\n",
         basename);
     exit(1);
 }

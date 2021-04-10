@@ -1,0 +1,4 @@
+Pour obtenir une application opérationnelle, l'exécuter et la tester, il faut exécuter dans un terminal Linux les commandes suivantes en étant dans le dossier v3 :
+	- "make"
+	- "./Numeros_tests_PCR 1 10", le deuxième argument (10) peut être changé par une valeur de votre choix (cf. rapport)
+	- "./Acquisition 5 Paris 0000 Numeros_tests_PCR_Paris.txt 2", le premier (5) et le dernier (2) argument peuvent être changés par une valeur de votre choix (cf. rapport).

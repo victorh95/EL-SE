@@ -33,7 +33,7 @@ sem_t semDemandeValidation;
 
 void usage(char * basename){
     fprintf(stderr,
-        "Utilisation : %s <taille de la mémoire> <nom du centre> <code à 4 chiffres du centre> <nom du fichier des résultats des tests PCR> <nombre terminaux>\n",
+        "Utilisation : %s <taille de la mémoire> <nom du centre> <code à 4 chiffres du centre> <nom du fichier des résultats des tests PCR> <nombre terminal>\n",
         basename);
     exit(1);
 }
@@ -41,9 +41,9 @@ void usage(char * basename){
 void *threadTerminalEntree(void *terminalES){
     struct ES *memoireTerminalES = terminalES;
     char* buffer = malloc(TAILLEBUF);
-    while(1){         
-        buffer = litLigne(memoireTerminalES->entree); 
-        for(int i = 0; i < tailleMemoire; i++){           
+    while(1){          
+        for(int i = 0; i < tailleMemoire; i++){  
+            buffer = litLigne(memoireTerminalES->entree);         
             if(strcmp(memoire[i].demande, "") == 0){               
                 sem_wait(&semEcrit);
                 memoire[i].entree = memoireTerminalES->entree;
@@ -63,8 +63,10 @@ void *threadTerminalSortie(void *inutilise){
         for(int i = 0; i < tailleMemoire; i++){           
             if(strcmp(memoire[i].reponse, "") != 0){
                 ecritLigne(memoire[i].sortie, memoire[i].reponse);
+                sem_wait(&semEcrit);
                 memoire[i].demande = "";
                 memoire[i].reponse = "";
+                sem_post(&semEcrit); 
             }                 
         }    
     }
@@ -133,13 +135,17 @@ int main(int argc, char *argv[]){
         pid = fork();
         if(pid == 0){
             char* entree = malloc(100);
+            //descripteur de fichier pour l'entrée du processus terminal (lecture)
             sprintf(entree, "%d", fdpipeTerminalEntree[0]); 
             char* sortie = malloc(100);
+            //descripteur de fichier pour la sortie du processus terminal (écriture)
             sprintf(sortie, "%d", fdpipeTerminalSortie[1]); 
             execlp("/usr/bin/xterm", "xterm", "-hold", "-e", "./Terminal", entree, sortie, "Numeros_tests_PCR.txt", NULL);
         } else if(pid > 0){
             struct ES *terminalES = malloc(100);
+            //descripteur de fichier pour l'entrée du processus acquisition (lecture) - en lien avec le thread terminal 
             terminalES->entree = fdpipeTerminalSortie[0];
+            //descripteur de fichier pour la sortie du processus acquisition (écriture) - en lien avec le thread terminal 
             terminalES->sortie = fdpipeTerminalEntree[1];
             pthread_create(&thTerminalEntree[i], NULL, threadTerminalEntree, terminalES);
         }
@@ -155,13 +161,17 @@ int main(int argc, char *argv[]){
     pid = fork();
     if(pid == 0){
         char* entree = malloc(100);
+        //descripteur de fichier pour l'entrée du processus validation (lecture)
         sprintf(entree, "%d", fdpipeValidationEntree[0]); 
         char* sortie = malloc(100);
+        //descripteur de fichier pour la sortie du processus validation (écriture)
         sprintf(sortie, "%d", fdpipeValidationSortie[1]); 
         execlp("./Validation", "./Validation", entree, sortie, argv[4], NULL);
     } else if(pid > 0){
         struct ES *validationES = malloc(100);
+        //descripteur de fichier pour l'entrée du processus acquisition (lecture) - en lien avec le thread validation 
         validationES->entree = fdpipeValidationSortie[0];
+        //descripteur de fichier pour la sortie du processus acquisition (écriture) - en lien avec le thread validation 
         validationES->sortie = fdpipeValidationEntree[1];
         pthread_create(&thValidation, NULL, threadValidation, validationES);
     }

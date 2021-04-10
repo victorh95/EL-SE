@@ -29,8 +29,8 @@ int centre;
 int stop;
 
 sem_t semLibre;
-sem_t semDemande1;
-sem_t semDemande2;
+sem_t semDemandeValidation;
+sem_t semDemandeInterArchives;
 
 void usage(char * basename) {
     fprintf(stderr,
@@ -57,8 +57,8 @@ void *threadTerminal(void *inutilise)
                     memoire[i].demande = buffer;
                 }  
             }            
-            sem_post(&semDemande1);
-            sem_post(&semDemande2);           
+            sem_post(&semDemandeValidation);
+            sem_post(&semDemandeInterArchives);           
         }       
         if(stop == tailleMemoire) pthread_exit(NULL);
         else stop = 0;
@@ -70,7 +70,7 @@ void *threadValidation(void *inutilise)
     char* buffer = malloc(TAILLEBUF);
     while(1){        
         for(int i = 0; i < tailleMemoire; i++){   
-            sem_wait(&semDemande1);         
+            sem_wait(&semDemandeValidation);         
             if((strcmp(memoire[i].reponse, "") == 0) && (memoire[i].demande[1] - '0' == centre)){
                 ecritLigne(fd1, memoire[i].demande);
                 buffer = litLigne(fd4);
@@ -87,7 +87,7 @@ void *threadInterArchives(void *inutilise)
     char* buffer = malloc(TAILLEBUF);
     while(1){        
         for(int i = 0; i < tailleMemoire; i++){
-            sem_wait(&semDemande2);
+            sem_wait(&semDemandeInterArchives);
             if((strcmp(memoire[i].reponse, "") == 0) && (memoire[i].demande[1] - '0' != centre)){
                 ecritLigne(fd2, memoire[i].demande);
                 buffer = litLigne(fd5);
@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
     stop = 0;
 
     sem_init(&semLibre, 0, tailleMemoire);
-    sem_init(&semDemande1, 0, 0);
-    sem_init(&semDemande2, 0, 0);
+    sem_init(&semDemandeValidation, 0, 0);
+    sem_init(&semDemandeInterArchives, 0, 0);
     pthread_t thTerminal, thValidation, thInterArchives;
     pthread_create(&thTerminal, NULL, threadTerminal, NULL);
     pthread_create(&thValidation, NULL, threadValidation, NULL);

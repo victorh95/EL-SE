@@ -26,11 +26,10 @@ int main(int argc, char *argv[]) {
     char* nTest = malloc(50);
     char* type = malloc(50);
     char* valeur = malloc(50);
-    char* nomFichier = argv[3]; 
     char* buffer = malloc(TAILLEBUF);
 
     while(1){
-        int fd = open(nomFichier, O_RDONLY);
+        int fd = open(argv[3], O_RDONLY);
         long nombreTests = strtol(litLigne(fd), NULL, 10);
         
         buffer = litLigne(entree);
@@ -42,7 +41,7 @@ int main(int argc, char *argv[]) {
             printf("Mauvais type de message. \n");
             exit(-1);
         }
-        printf("test");
+
         for(int i = 0; i < nombreTests; i++){
             buffer = strtok(litLigne(fd), " " );
             if(strcmp(buffer, nTest) == 0){
